@@ -78,6 +78,9 @@ jobs:
     if: always()
     permissions:
       issues: write
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
     steps:
       - name: Write job summary
         if: always()
@@ -96,7 +99,7 @@ jobs:
           echo "| Run | [View logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |" >> $GITHUB_STEP_SUMMARY
 
       - name: Notify Slack on failure
-        if: needs.python-unit-tests.result == 'failure' && secrets.SLACK_WEBHOOK_URL != ''
+        if: needs.python-unit-tests.result == 'failure' && env.SLACK_WEBHOOK_URL != ''
         uses: slackapi/slack-github-action@v2
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -116,7 +119,7 @@ jobs:
             }
 
       - name: Send failure email
-        if: needs.python-unit-tests.result == 'failure' && secrets.MAIL_USERNAME != ''
+        if: needs.python-unit-tests.result == 'failure' && env.MAIL_USERNAME != ''
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
